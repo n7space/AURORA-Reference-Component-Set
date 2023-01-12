@@ -27,7 +27,6 @@ void environment_startup(void)
    }
 }
 
-#define TFIELD_IDX 1
 #define SECONDS_IDX 3
 
 asn1SccCucTimestamp getCucTimestamp()
@@ -48,12 +47,12 @@ void environment_PI_Trigger(void)
    LOG_VARIABLE_ENDL("Nanoseconds from start: ", nseconds);
 
    asn1SccCucTimestamp firstCucTimestamp = getCucTimestamp();
-   print_time_array(firstCucTimestamp.arr + TFIELD_IDX);
-   LOG_VARIABLE_ENDL("First CUC timestamp seconds: ", firstCucTimestamp.arr[TFIELD_IDX + SECONDS_IDX]);
+   print_time_array(firstCucTimestamp.arr);
+   LOG_VARIABLE_ENDL("First CUC timestamp seconds: ", firstCucTimestamp.arr[SECONDS_IDX]);
 
    asn1SccCucTimestamp secondCucTimestamp = getCucTimestamp();
-   print_time_array(secondCucTimestamp.arr + TFIELD_IDX);
-   LOG_VARIABLE_ENDL("Second CUC timestamp seconds: ", secondCucTimestamp.arr[TFIELD_IDX + SECONDS_IDX]);
+   print_time_array(secondCucTimestamp.arr);
+   LOG_VARIABLE_ENDL("Second CUC timestamp seconds: ", secondCucTimestamp.arr[SECONDS_IDX]);
 
    asn1SccComparisonResult compareResultCuc = 0;
    environment_RI_CucTimestampCmp(&secondCucTimestamp, &firstCucTimestamp, &compareResultCuc);
@@ -69,7 +68,7 @@ void environment_PI_Trigger(void)
 
    asn1SccComparisonResult compareResultCfs = 0;
    environment_RI_CfsTimestampCmp(&cfsTimestamp2, &cfsTimestamp1, &compareResultCfs);
-   LOG_VARIABLE_ENDL("Comparison result cfs: ", compareResultCfs);
+   LOG_VARIABLE_ENDL("CFS timestamps comparison result: ", compareResultCfs);
 
    LOG("\n");
 }

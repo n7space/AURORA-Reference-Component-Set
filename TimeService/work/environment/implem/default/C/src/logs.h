@@ -1,20 +1,15 @@
-#ifndef COMMON_H
-#define COMMON_H
+#ifndef LOGS_H
+#define LOGS_H
 
 #include <stdint.h>
 #include <stdlib.h>
 
-#define LOG(msg)
-#define LOG_VARIABLE(msg, x)
-
-#ifdef GENERIC_LINUX_TARGET
+#if defined(GENERIC_LINUX_TARGET)
 
 #define LOG(msg) printf(msg)
 #define LOG_VARIABLE(msg, x) printf(msg); printf("%ld", x)
 
-#endif
-
-#ifdef RTEMS6_TARGET
+#elif defined(RTEMS6_TARGET)
 
 #include <rtems.h>
 #include <rtems/bspIo.h>
@@ -22,7 +17,13 @@
 #define LOG(msg) rtems_log(msg)
 #define LOG_VARIABLE(msg, x) rtems_log_variable(msg, x);
 
+#else
+
+#define LOG(msg)
+#define LOG_VARIABLE(msg, x)
+
 #endif
+
 
 #define NS_PER_SECOND (1000000000)
 

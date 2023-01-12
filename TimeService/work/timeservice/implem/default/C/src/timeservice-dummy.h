@@ -13,7 +13,7 @@ static uint64_t adjust_endianess(uint64_t x)
     return x;
 }
 
-ClockStatusEnum check_clock_available()
+static int check_clock_available()
 {
     return false;
 }

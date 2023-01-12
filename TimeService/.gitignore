@@ -5,3 +5,4 @@ work/Dump/
 work/glue_release
 work/skeletons_built
 .vscode/
+scripts/out.txt

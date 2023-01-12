@@ -2,7 +2,6 @@
 
 #define BYTE_CAPACITY 256
 #define CUC_TFIELD_SIZE 7
-#define CUC_TFIELD_IDX 1
 
 asn1SccCucTimestamp nanoseconds_to_cuc_timestamp(uint64_t nanoseconds)
 {
@@ -16,7 +15,7 @@ asn1SccCucTimestamp nanoseconds_to_cuc_timestamp(uint64_t nanoseconds)
 
     for (size_t i = 0; i < CUC_TFIELD_SIZE; i++)
     {
-        timestamp.arr[CUC_TFIELD_IDX + i] = time[CUC_TFIELD_SIZE - 1 - i];
+        timestamp.arr[i] = time[CUC_TFIELD_SIZE - 1 - i];
     }
     return timestamp;
 }
@@ -84,7 +83,7 @@ asn1SccComparisonResult TimeService_CucTimestampCmp(TimeService *const self, con
     // Unused in this implementation
     (void)self;
 
-    return cmp_memory(timestamp1 + CUC_TFIELD_IDX, timestamp2 + CUC_TFIELD_IDX, CUC_TFIELD_SIZE);
+    return cmp_memory(timestamp1->arr, timestamp2->arr, CUC_TFIELD_SIZE);
 }
 
 
