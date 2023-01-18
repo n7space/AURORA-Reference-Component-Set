@@ -38,7 +38,7 @@ asn1SccComparisonResult TimeService_CfsTimestampCmp(TimeService *const self, con
     {
         return -1;
     }
-    else if (timestamp1->seconds == timestamp2->seconds)
+    else
     {
         if (timestamp1->subseconds > timestamp2->subseconds)
         {

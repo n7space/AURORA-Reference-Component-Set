@@ -15,4 +15,3 @@ DISTFILES += TimeService.asn
 DISTFILES += TimeService.acn
 include(work/taste.pro)
 message($$DISTFILES)
-

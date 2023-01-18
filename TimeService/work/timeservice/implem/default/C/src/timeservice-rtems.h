@@ -8,6 +8,7 @@
 
 static uint64_t get_time()
 {
+   // This reuses perf mon timers that are initialized in auto-generated code
    uint64_t ticks = UINT64_MAX - ((uint64_t)(Timer_Apbctrl1_getCounterValue(&timer_2) + 1) << 32
          | Timer_Apbctrl1_getCounterValue(&timer_1));
    long double ticks_per_nanosecond = (long double)TICKS_PER_SECOND / NS_PER_SECOND;

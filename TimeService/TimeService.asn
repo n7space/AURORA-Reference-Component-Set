@@ -4,7 +4,7 @@ BEGIN
    ULongInteger ::= INTEGER (0 .. 18446744073709551615)
    ComparisonResult ::= INTEGER (-1 .. 1)
    ClockStatusEnum  ::= ENUMERATED { unavailable, available }
-   CucTimestamp ::= OCTET STRING (SIZE(8))
+   CucTimestamp ::= OCTET STRING (SIZE(7))
    CfsTimestamp ::= SEQUENCE {
         seconds    UInteger,
         subseconds UInteger
