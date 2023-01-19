@@ -1,0 +1,9 @@
+DATASTORE-DATAVIEW DEFINITIONS ::=
+BEGIN
+
+    MyInteger ::= INTEGER (0 .. 10000)
+    DataType ::= INTEGER (0 .. 100000)
+    KeyType ::= INTEGER (0 .. 1000000)
+
+END
+

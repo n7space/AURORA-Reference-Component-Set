@@ -1,0 +1,104 @@
+<InterfaceView asn1file="datastore.asn">
+<Function name="Environment" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="-17600 6600 2400 25700"/>
+<Provided_Interface name="Trigger" kind="Cyclic" enable_multicast="true" layer="default" required_system_element="NO" priority="1" stack_size="1024" wcet="0">
+    <Property name="Taste::coordinates" value="-11700 7700"/>
+</Provided_Interface>
+
+<Required_Interface name="Create" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" wcet="0">
+    <Input_Parameter name="p1" type="DataType" encoding="NATIVE"/>
+    <Output_Parameter name="key" type="KeyType" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="2400 8700"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="Read" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" wcet="0">
+    <Input_Parameter name="key" type="KeyType" encoding="NATIVE"/>
+    <Output_Parameter name="p2" type="DataType" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="2400 12300"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="Update" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" wcet="0">
+    <Input_Parameter name="key" type="KeyType" encoding="NATIVE"/>
+    <Input_Parameter name="new_data" type="DataType" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="2400 15600"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+<Required_Interface name="Delete" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" wcet="0">
+    <Input_Parameter name="key" type="KeyType" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="2400 18900"/>
+    <Property name="Taste::InheritPI" value="true"/>
+    <Property name="Taste::Autonamed" value="true"/>
+</Required_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Function name="Datastore" is_type="NO" language="C" default_implementation="default" fixed_system_element="NO" required_system_element="NO" startup_priority="1" FPGA_Configurations="">
+    <Property name="Taste::coordinates" value="22500 5100 42500 24700"/>
+<Provided_Interface name="Create" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" wcet="0">
+    <Input_Parameter name="p1" type="DataType" encoding="NATIVE"/>
+    <Output_Parameter name="key" type="KeyType" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="22500 8200"/>
+</Provided_Interface>
+
+<Provided_Interface name="Read" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" wcet="0">
+    <Input_Parameter name="key" type="KeyType" encoding="NATIVE"/>
+    <Output_Parameter name="p2" type="DataType" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="22500 11600"/>
+</Provided_Interface>
+
+<Provided_Interface name="Update" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" wcet="0">
+    <Input_Parameter name="key" type="KeyType" encoding="NATIVE"/>
+    <Input_Parameter name="new_data" type="DataType" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="22500 14900"/>
+</Provided_Interface>
+
+<Provided_Interface name="Delete" kind="Unprotected" enable_multicast="true" layer="default" required_system_element="NO" wcet="0">
+    <Input_Parameter name="key" type="KeyType" encoding="NATIVE"/>
+    <Property name="Taste::coordinates" value="22500 18400"/>
+</Provided_Interface>
+
+    <Implementations>
+        <Implementation name="default" language="C"/>
+    </Implementations>
+</Function>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Environment" ri_name="Create"/>
+    <Target func_name="Datastore" pi_name="Create"/>
+    <Property name="Taste::coordinates" value="3000 8700 12600 8700 22200 8200"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Environment" ri_name="Delete"/>
+    <Target func_name="Datastore" pi_name="Delete"/>
+    <Property name="Taste::coordinates" value="3000 18900 12600 18900 22200 18400"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Environment" ri_name="Read"/>
+    <Target func_name="Datastore" pi_name="Read"/>
+    <Property name="Taste::coordinates" value="3000 12300 12600 12300 20600 11600 22200 11600"/>
+</Connection>
+
+<Connection  required_system_element="NO">
+    <Source func_name="Environment" ri_name="Update"/>
+    <Target func_name="Datastore" pi_name="Update"/>
+    <Property name="Taste::coordinates" value="3000 15600 12600 15600 20600 14900 22200 14900"/>
+</Connection>
+
+<Comment name="Welcome to TASTE!\n============\n\nRight click to add a function, and use Ctrl-Click to connect functions together.\n\nYou can split the screen in multiple windows using Ctrl-E-3" required_system_element="NO">
+    <Property name="Taste::coordinates" value="1900 -17600 43200 -2000"/>
+</Comment>
+
+<Layer name="default"/>
+
+</InterfaceView>
