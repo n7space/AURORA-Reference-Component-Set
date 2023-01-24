@@ -3,6 +3,12 @@
 #define BYTE_CAPACITY 256
 #define CUC_TFIELD_SIZE 7
 
+asn1SccCfsTimestamp nanoseconds_to_cfs_timestamp(uint64_t nanoseconds)
+{
+    asn1SccCfsTimestamp timestamp;
+    return timestamp;
+}
+
 asn1SccCucTimestamp nanoseconds_to_cuc_timestamp(uint64_t nanoseconds)
 {
     asn1SccCucTimestamp timestamp;
@@ -23,6 +29,14 @@ asn1SccCucTimestamp nanoseconds_to_cuc_timestamp(uint64_t nanoseconds)
 void TimeService_Startup(TimeService *const self)
 {
     self->starting_time = get_time();
+}
+
+void TimeService_CfsTimestamp(TimeService *const self, asn1SccULongInteger nanoseconds, asn1SccCfsTimestamp *timestamp)
+{
+    // Unused in this implementation
+    (void)self;
+    
+    *timestamp = nanoseconds_to_cfs_timestamp(nanoseconds);
 }
 
 asn1SccComparisonResult TimeService_CfsTimestampCmp(TimeService *const self, const asn1SccCfsTimestamp *timestamp1, const asn1SccCfsTimestamp *timestamp2)

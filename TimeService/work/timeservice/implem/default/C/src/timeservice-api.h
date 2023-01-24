@@ -22,6 +22,9 @@ typedef struct
 void TimeService_Startup(TimeService *const self);
 
 
+void TimeService_CfsTimestamp(TimeService *const self, const asn1SccULongInteger nanoseconds, asn1SccCfsTimestamp *timestamp);
+
+
 asn1SccComparisonResult TimeService_CfsTimestampCmp(TimeService *const self, const asn1SccCfsTimestamp *timestamp1, const asn1SccCfsTimestamp *timestamp2);
 
 
