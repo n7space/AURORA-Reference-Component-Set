@@ -11,10 +11,15 @@
 extern "C" {
 #endif
 
+#include <stdlib.h>
+#include <stdio.h>
 
 void timeservice_startup(void);
 
 /* Provided interfaces */
+void timeservice_PI_CfsTimestamp( const asn1SccULongInteger *, asn1SccCfsTimestamp * );
+
+
 void timeservice_PI_CfsTimestampCmp( const asn1SccCfsTimestamp *, const asn1SccCfsTimestamp *, asn1SccComparisonResult * );
 
 

@@ -13,9 +13,15 @@
 
 static TimeService time_service;
 
+
 void timeservice_startup(void)
 {
    TimeService_Startup(&time_service);
+}
+
+void timeservice_PI_CfsTimestamp(const asn1SccULongInteger *nanoseconds, asn1SccCfsTimestamp *timestamp)
+{
+   TimeService_CfsTimestamp(&time_service, *nanoseconds, timestamp);
 }
 
 void timeservice_PI_CfsTimestampCmp(const asn1SccCfsTimestamp *t1, const asn1SccCfsTimestamp *t2, asn1SccComparisonResult *result)

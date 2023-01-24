@@ -11,6 +11,8 @@
 extern "C" {
 #endif
 
+#include <stdlib.h>
+#include <stdio.h>
 
 void environment_startup(void);
 
@@ -18,6 +20,9 @@ void environment_startup(void);
 void environment_PI_Trigger( void );
 
 /* Required interfaces */
+extern void environment_RI_CfsTimestamp( const asn1SccULongInteger *, asn1SccCfsTimestamp * );
+
+
 extern void environment_RI_CfsTimestampCmp( const asn1SccCfsTimestamp *, const asn1SccCfsTimestamp *, asn1SccComparisonResult * );
 
 
