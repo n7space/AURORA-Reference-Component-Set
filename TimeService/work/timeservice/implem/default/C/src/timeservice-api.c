@@ -1,13 +1,14 @@
 #include "timeservice-api.h"
 
+#define CFS_2E32 4294967296ull
 #define BYTE_CAPACITY 256
 #define CUC_TFIELD_SIZE 7
 
 asn1SccCfsTimestamp nanoseconds_to_cfs_timestamp(uint64_t nanoseconds)
 {
     asn1SccCfsTimestamp timestamp;
-    timestamp.seconds = nanoseconds / NS_PER_SECOND;
-    timestamp.subseconds = nanoseconds % NS_PER_SECOND;
+    timestamp.seconds = nanoseconds / CFS_2E32;
+    timestamp.subseconds = nanoseconds % CFS_2E32;
     return timestamp;
 }
 
