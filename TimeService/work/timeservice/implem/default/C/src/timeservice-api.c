@@ -6,6 +6,8 @@
 asn1SccCfsTimestamp nanoseconds_to_cfs_timestamp(uint64_t nanoseconds)
 {
     asn1SccCfsTimestamp timestamp;
+    timestamp.seconds = nanoseconds / NS_PER_SECOND;
+    timestamp.subseconds = nanoseconds % NS_PER_SECOND;
     return timestamp;
 }
 
