@@ -20,16 +20,16 @@ void environment_startup(void);
 void environment_PI_Trigger( void );
 
 /* Required interfaces */
-extern void environment_RI_Create( const asn1SccDataType *, asn1SccKeyType * );
+extern void environment_RI_Create( const asn1SccMyInteger *, asn1SccMyInteger * );
 
 
-extern void environment_RI_Delete( const asn1SccKeyType * );
+extern void environment_RI_Delete( const asn1SccMyInteger * );
 
 
-extern void environment_RI_Read( const asn1SccKeyType *, asn1SccDataType * );
+extern void environment_RI_Read( const asn1SccMyInteger *, asn1SccMyInteger * );
 
 
-extern void environment_RI_Update( const asn1SccKeyType *, const asn1SccDataType * );
+extern void environment_RI_Update( const asn1SccMyInteger *, const asn1SccMyInteger * );
 
 
 #ifdef __cplusplus

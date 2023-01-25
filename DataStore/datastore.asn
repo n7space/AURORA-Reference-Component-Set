@@ -1,9 +1,50 @@
 DATASTORE-DATAVIEW DEFINITIONS ::=
 BEGIN
+   -- client types for demonstration
+   MyInteger ::= INTEGER (0 .. 10000)
+   MyPacket ::= SEQUENCE {
+      red MyInteger,
+      green MyInteger,
+      blue MyInteger
+   }
 
-    MyInteger ::= INTEGER (0 .. 10000)
-    DataType ::= INTEGER (0 .. 100000)
-    KeyType ::= INTEGER (0 .. 1000000)
+   -- types defined by time service
+   UInteger ::= INTEGER (0 .. 4294967295)
+   ComparisonResult ::= INTEGER (-1 .. 1)
+   ClockStatusEnum  ::= ENUMERATED { unavailable, available }
+   CucTimestamp ::= OCTET STRING (SIZE(7))
+   CfsTimestamp ::= SEQUENCE {
+      seconds    UInteger,
+      subseconds UInteger
+   }
+
+   -- short integer used to configure datastore
+   UShortInteger ::= INTEGER (0 .. 65535)
+
+   -- time
+   ULongInteger ::= INTEGER (0 .. 18446744073709551615
+
+   -- key type for datastore service
+   DataStoreKeyType ::= INTEGER (0 .. 65535)
+
+   -- value type for datastore service
+   DataStoreValueType ::= CHOICE {
+      coefficient MyInteger,
+      color MyPacket
+   }
+
+   -- configurable data store maximum size
+   dataStoreSize UShortInteger ::= 100
+
+   -- internal type used by data store service
+   DataStoreInternalDataItem ::= SEQUENCE {
+      item-key DataStoreKeyType,
+      item-value DataStoreValueType,
+      item-timestamp ULongInteger
+   }
+
+   -- internal type used by data store service
+   DataStoreInternalDataStorage ::= SEQUENCE (SIZE(0 .. dataStoreSize)) OF DataStoreInternalDataItem
 
 END
 

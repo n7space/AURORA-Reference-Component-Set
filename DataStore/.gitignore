@@ -7,8 +7,5 @@
 **/work/system.asn
 **/work.system_post.asn
 .vscode/
-taste.pro
 *.pro.user
 *.msc
-
-datastore.pro

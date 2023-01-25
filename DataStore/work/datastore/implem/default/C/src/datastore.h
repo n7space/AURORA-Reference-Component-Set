@@ -17,16 +17,16 @@ extern "C" {
 void datastore_startup(void);
 
 /* Provided interfaces */
-void datastore_PI_Create( const asn1SccDataType *, asn1SccKeyType * );
+void datastore_PI_Create( const asn1SccMyInteger *, asn1SccMyInteger * );
 
 
-void datastore_PI_Delete( const asn1SccKeyType * );
+void datastore_PI_Delete( const asn1SccMyInteger * );
 
 
-void datastore_PI_Read( const asn1SccKeyType *, asn1SccDataType * );
+void datastore_PI_Read( const asn1SccMyInteger *, asn1SccMyInteger * );
 
 
-void datastore_PI_Update( const asn1SccKeyType *, const asn1SccDataType * );
+void datastore_PI_Update( const asn1SccMyInteger *, const asn1SccMyInteger * );
 
 /* Required interfaces */
 
