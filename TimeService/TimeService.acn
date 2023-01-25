@@ -1,0 +1,6 @@
+TIMESERVICE-DATAVIEW DEFINITIONS ::= BEGIN
+
+   ULongInteger [encoding pos-int, size 64]
+   UInteger     [encoding pos-int, size 32]
+
+END

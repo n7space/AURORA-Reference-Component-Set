@@ -1,0 +1,15 @@
+work/binaries/
+work/build/
+work/Debug/
+work/Dump/
+work/glue_release
+work/skeletons_built
+work/system.asn
+work.system_post.asn
+.vscode/
+scripts/out.txt
+taste.pro
+*.pro.user
+*.msc
+
+timeservice.pro

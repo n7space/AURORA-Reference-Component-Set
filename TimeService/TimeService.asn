@@ -1,0 +1,12 @@
+TIMESERVICE-DATAVIEW DEFINITIONS ::=
+BEGIN
+   UInteger ::= INTEGER (0 .. 4294967295)
+   ULongInteger ::= INTEGER (0 .. 18446744073709551615)
+   ComparisonResult ::= INTEGER (-1 .. 1)
+   ClockStatusEnum  ::= ENUMERATED { unavailable, available }
+   CucTimestamp ::= OCTET STRING (SIZE(7))
+   CfsTimestamp ::= SEQUENCE {
+        seconds    UInteger,
+        subseconds UInteger
+  }
+END
