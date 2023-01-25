@@ -6,9 +6,14 @@
 
 asn1SccCfsTimestamp nanoseconds_to_cfs_timestamp(uint64_t nanoseconds)
 {
+    // scale fractional range to (0..CFS_2E32)
+    uint64_t fraction = nanoseconds % NS_PER_SECOND;
+    fraction *= CFS_2E32;
+    fraction /= NS_PER_SECOND;
+
     asn1SccCfsTimestamp timestamp;
-    timestamp.seconds = nanoseconds / CFS_2E32;
-    timestamp.subseconds = nanoseconds % CFS_2E32;
+    timestamp.seconds = nanoseconds / NS_PER_SECOND;
+    timestamp.subseconds = (uint32_t) fraction;
     return timestamp;
 }
 
