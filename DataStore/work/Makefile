@@ -16,11 +16,6 @@ DATAVIEW_AADLV2 := ${DATAVIEW_PATH}/dataview_aadlv2.aadl
 export PROJECT_CACHE=${HOME}/.taste_AST_cache
 export IV_FILE=$(shell readlink -f ../interfaceview.xml)
 all:	build-default
-	$(info Run "make -C work check_stack" to analyze the stack usage of your application")
-
-# Call the stack checker
-check_stack:
-	$(MAKE) -C build -f Makefile.taste check_stack
 
 
 # Check that all runtimes used in the system are installed
@@ -73,7 +68,7 @@ build/system_config.h:	$(wildcard */*/wrappers/*_system_config.h)
 	cat $^ > $@
 
 #  Call DMT/aadl2glueC to generate glue code from the mini-cv.aadl files
-aadl2glueC:	datastore/C/wrappers/aadl2glueC_built environment/C/wrappers/aadl2glueC_built
+aadl2glueC:	datastore/C/wrappers/aadl2glueC_built environment/C/wrappers/aadl2glueC_built timeservice/C/wrappers/aadl2glueC_built
 
 # Build dataview.aadl in AADLv1 format, used by DMT to generate glue code
 ${DATAVIEW_AADLV1}: ${DATAVIEW_UNIQ}
@@ -88,6 +83,10 @@ datastore/C/wrappers/aadl2glueC_built: datastore/C/wrappers/datastore_mini_cv.aa
 	touch $@
 
 environment/C/wrappers/aadl2glueC_built: environment/C/wrappers/environment_mini_cv.aadl ${DATAVIEW_AADLV1}
+	aadl2glueC -allboards -o $(dir $@) $^
+	touch $@
+
+timeservice/C/wrappers/aadl2glueC_built: timeservice/C/wrappers/timeservice_mini_cv.aadl ${DATAVIEW_AADLV1}
 	aadl2glueC -allboards -o $(dir $@) $^
 	touch $@
 

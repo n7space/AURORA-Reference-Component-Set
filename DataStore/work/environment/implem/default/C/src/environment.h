@@ -19,17 +19,26 @@ void environment_startup(void);
 /* Provided interfaces */
 void environment_PI_Trigger( void );
 
+
+void environment_PI_notify( const asn1SccT_EventMessage * );
+
 /* Required interfaces */
-extern void environment_RI_Create( const asn1SccMyInteger *, asn1SccMyInteger * );
+extern void environment_RI_Clean( void );
 
 
-extern void environment_RI_Delete( const asn1SccMyInteger * );
+extern void environment_RI_Create( const asn1SccDataStoreCreateRequect * );
 
 
-extern void environment_RI_Read( const asn1SccMyInteger *, asn1SccMyInteger * );
+extern void environment_RI_Delete( const asn1SccDataStoreDeleteRequest * );
 
 
-extern void environment_RI_Update( const asn1SccMyInteger *, const asn1SccMyInteger * );
+extern void environment_RI_Retrieve( const asn1SccDataStoreRetrieveRequest * );
+
+
+extern void environment_RI_RetriveByTimeRange( const asn1SccDataStoreRetrieveTimestampRangeRequest * );
+
+
+extern void environment_RI_Update( const asn1SccDataStoreUpdateRequest * );
 
 
 #ifdef __cplusplus

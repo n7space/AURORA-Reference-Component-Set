@@ -8,8 +8,6 @@
     !! file. The up-to-date signatures can be found in the .ads file.   !!
 */
 #include "environment.h"
-#include "Logs.h"
-
 
 void environment_startup(void)
 {
@@ -21,48 +19,11 @@ void environment_startup(void)
 
 void environment_PI_Trigger( void )
 {
-   static int iteration;
-   iteration++;
-   LOG_VARIABLE_ENDL("START iteration: ", iteration);
 
-   asn1SccKeyType key;
-   asn1SccDataType data = 0;
-   asn1SccDataType *dataPtr = &data;
+}
 
-   *dataPtr = 42;
-   environment_RI_Create(dataPtr, &key);
-   *dataPtr = 43;
-   environment_RI_Create(dataPtr, &key);
-   *dataPtr = 44;
-   environment_RI_Create(dataPtr, &key);
-   LOG_VARIABLE_ENDL("Key: ", key);
 
-   key = 2;
-   environment_RI_Read(&key, dataPtr);
-   if (dataPtr != NULL) {
-      LOG_VARIABLE_ENDL("Read item: ", *dataPtr);
-   } else {
-      LOG("Read item is NULL\n");
-   }
+void environment_PI_notify( const asn1SccT_EventMessage * ev)
+{
 
-   key = 2;
-   *dataPtr = 127;
-   environment_RI_Update(&key, dataPtr);
-
-   environment_RI_Read(&key, dataPtr);
-   if (dataPtr != NULL) {
-      LOG_VARIABLE_ENDL("Read item: ", *dataPtr);
-   } else {
-      LOG("Read item is NULL\n");
-   }
-
-   key = 3;
-   environment_RI_Delete(&key);
-   environment_RI_Read(&key, dataPtr);
-   if (dataPtr != NULL) {
-      LOG_VARIABLE_ENDL("Read item: ", *dataPtr);
-   } else {
-      LOG("Read item is NULL\n");
-   }
-   LOG("\n");
 }

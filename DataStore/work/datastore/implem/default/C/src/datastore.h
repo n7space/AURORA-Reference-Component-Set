@@ -17,19 +17,40 @@ extern "C" {
 void datastore_startup(void);
 
 /* Provided interfaces */
-void datastore_PI_Create( const asn1SccMyInteger *, asn1SccMyInteger * );
+void datastore_PI_Clean( void );
 
 
-void datastore_PI_Delete( const asn1SccMyInteger * );
+void datastore_PI_Create( const asn1SccDataStoreCreateRequect * );
 
 
-void datastore_PI_Read( const asn1SccMyInteger *, asn1SccMyInteger * );
+void datastore_PI_Delete( const asn1SccDataStoreDeleteRequest * );
 
 
-void datastore_PI_Update( const asn1SccMyInteger *, const asn1SccMyInteger * );
+void datastore_PI_Retrieve( const asn1SccDataStoreRetrieveRequest * );
+
+
+void datastore_PI_RetriveByTimeRange( const asn1SccDataStoreRetrieveTimestampRangeRequest * );
+
+
+void datastore_PI_Update( const asn1SccDataStoreUpdateRequest * );
 
 /* Required interfaces */
+extern void datastore_RI_CfsTimestampCmp( const asn1SccCfsTimestamp *, const asn1SccCfsTimestamp *, asn1SccComparisonResult * );
 
+
+extern void datastore_RI_ClockStatus( asn1SccClockStatusEnum * );
+
+
+extern void datastore_RI_CucTimestamp( const asn1SccULongInteger *, asn1SccCucTimestamp * );
+
+
+extern void datastore_RI_CucTimestampCmp( const asn1SccCucTimestamp *, const asn1SccCucTimestamp *, asn1SccComparisonResult * );
+
+
+extern void datastore_RI_ObetTime( asn1SccULongInteger * );
+
+
+extern void datastore_RI_notify( const asn1SccT_EventMessage * );
 
 
 #ifdef __cplusplus

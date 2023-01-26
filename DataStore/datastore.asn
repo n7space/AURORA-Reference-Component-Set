@@ -1,5 +1,8 @@
 DATASTORE-DATAVIEW DEFINITIONS ::=
 BEGIN
+IMPORTS
+    T-UInt32, T-UInt8 FROM TASTE-BasicTypes;
+
    -- client types for demonstration
    MyInteger ::= INTEGER (0 .. 10000)
    MyPacket ::= SEQUENCE {
@@ -22,7 +25,7 @@ BEGIN
    UShortInteger ::= INTEGER (0 .. 65535)
 
    -- time
-   ULongInteger ::= INTEGER (0 .. 18446744073709551615
+   ULongInteger ::= INTEGER (0 .. 18446744073709551615)
 
    -- key type for datastore service
    DataStoreKeyType ::= INTEGER (0 .. 65535)
@@ -34,7 +37,32 @@ BEGIN
    }
 
    -- configurable data store maximum size
-   dataStoreSize UShortInteger ::= 100
+   data-store-size UShortInteger ::= 100
+
+   data-store-log-size UShortInteger ::= 50
+
+   DataStoreCreateRequect ::= SEQUENCE {
+      item-value DataStoreValueType,
+      behaviour ENUMERATED { free-existing, reject-when-overflow }
+   }
+
+   DataStoreRetrieveRequest ::= SEQUENCE {
+      item-key DataStoreKeyType
+   }
+
+   DataStoreUpdateRequest ::= SEQUENCE {
+      item-key DataStoreKeyType,
+      item-value DataStoreValueType
+   }
+
+   DataStoreDeleteRequest ::= SEQUENCE {
+      item-key DataStoreKeyType
+   }
+
+   DataStoreRetrieveTimestampRangeRequest ::= SEQUENCE {
+      starting-timestamp ULongInteger,
+      ending-timestamp ULongInteger
+   }
 
    -- internal type used by data store service
    DataStoreInternalDataItem ::= SEQUENCE {
@@ -43,8 +71,67 @@ BEGIN
       item-timestamp ULongInteger
    }
 
+   DataStoreInternalLogItem ::= SEQUENCE {
+      timestamp ULongInteger,
+      operation CHOICE {
+         item-created DataStoreKeyType,
+         item-retrieved DataStoreKeyType,
+         item-updated DataStoreKeyType,
+         item-deleted DataStoreKeyType,
+         store-rejected SEQUENCE {},
+         item-removed DataStoreKeyType,
+         item-by-timestamp-retrieved SEQUENCE {
+            starting-timestamp ULongInteger,
+            ending-timestamp ULongInteger
+         },
+         data-store-cleaned SEQUENCE {},
+         data-store-error SEQUENCE {}
+      }
+   }
+
    -- internal type used by data store service
-   DataStoreInternalDataStorage ::= SEQUENCE (SIZE(0 .. dataStoreSize)) OF DataStoreInternalDataItem
+   DataStoreInternalDataStorage ::= SEQUENCE (SIZE(data-store-size)) OF DataStoreInternalDataItem
+
+   -- internal type used by data store service
+   DataStoreInternalLogStorage ::= SEQUENCE (SIZE(data-store-log-size)) OF DataStoreInternalLogItem
+
+   T-EventMessage ::= CHOICE {
+      item-created SEQUENCE {
+         item-key DataStoreKeyType,
+         item-timestamp ULongInteger
+      },
+      item-retrieved SEQUENCE {
+         item-key DataStoreKeyType,
+         item-value DataStoreValueType,
+         item-timestamp ULongInteger
+      },
+      item-updated SEQUENCE {
+         item-key DataStoreKeyType,
+         item-timestamp ULongInteger
+      },
+      item-deleted SEQUENCE {
+         item-key DataStoreKeyType,
+         item-timestamp ULongInteger
+      },
+      item-store-rejected SEQUENCE {
+         timestamp ULongInteger
+      },
+      item-by-timestamp-retrieved CHOICE {
+         finished SEQUENCE {},
+         item SEQUENCE {
+            item-key DataStoreKeyType,
+            item-value DataStoreValueType,
+            item-timestamp ULongInteger
+         }
+      },
+      item-removed SEQUENCE {
+         item-key DataStoreKeyType,
+         item-timestamp ULongInteger
+      },
+      data-store-cleaned SEQUENCE {
+      },
+      data-store-error ENUMERATED { item-not-found }
+   }
 
 END
 

@@ -9,37 +9,350 @@
 */
 #include "datastore.h"
 
-#include "DataStore.h"
-#include "Logs.h"
+static asn1SccDataStoreInternalDataStorage storage;
+static size_t storage_first_index;
+static size_t storage_last_index;
+static int storage_empty;
+static asn1SccDataStoreKeyType storage_next_key;
+static asn1SccDataStoreInternalLogStorage log_storage;
+static size_t log_storage_first_index;
+static size_t log_storage_last_index;
+static int log_storage_empty;
 
-static DataStore datastore;
+static asn1SccDataStoreInternalLogItem log_item;
+static asn1SccT_EventMessage notify_message;
+
+static int is_storage_full(void)
+{
+    return !storage_empty && (storage_last_index == storage_first_index);
+}
+
+static int is_storage_empty(void)
+{
+    return storage_empty;
+}
+
+static size_t find_key_in_storage(asn1SccDataStoreKeyType key)
+{
+    if(is_storage_empty())
+    {
+        return data_store_size;
+    }
+    if(is_storage_full())
+    {
+        for(size_t index = 0; index < data_store_size; ++index)
+        {
+            if(storage.arr[index].item_key == key)
+            {
+                return index;
+            }
+        }
+    }
+    else
+    {
+        for(size_t index = storage_first_index;
+            (index % data_store_size) != ((storage_last_index + 1) % data_store_size);
+            ++index)
+        {
+            if(storage.arr[index % data_store_size].item_key == key)
+            {
+                return index % data_store_size;
+            }
+        }
+    }
+    return data_store_size;
+}
+
+static void append_log_item(asn1SccDataStoreInternalLogItem* item)
+{
+    if(log_storage_empty)
+    {
+        log_storage_empty = 0;
+        log_storage.arr[log_storage_last_index] = *item;
+    }
+    else
+    {
+        log_storage_last_index = (log_storage_last_index + 1) % data_store_log_size;
+        if(log_storage_first_index == log_storage_last_index)
+        {
+            log_storage_first_index = (log_storage_first_index + 1) % data_store_log_size;
+        }
+        log_storage.arr[log_storage_last_index] = *item;
+    }
+}
 
 void datastore_startup(void)
 {
-   DataStore_Init(&datastore, 3, false);
+    storage_first_index = 0;
+    storage_last_index = 0;
+    storage_empty = 1;
+    storage_next_key = 0;
+    log_storage_first_index = 0;
+    log_storage_last_index = 0;
+    log_storage_empty = 1;
 }
 
-void datastore_PI_Create(const asn1SccDataType *data, asn1SccKeyType *key)
+void datastore_PI_Clean(void)
 {
-   *key = DataStore_Create(&datastore, *data);
+    storage_first_index = 0;
+    storage_last_index = 0;
+    storage_empty = 1;
+
+    // notify clean
+    notify_message.kind = T_EventMessage_data_store_cleaned_PRESENT;
+    datastore_RI_notify(&notify_message);
+
+    // append log - data store cleaned
+    datastore_RI_ObetTime(&log_item.timestamp);
+    log_item.operation.kind = DataStoreInternalLogItem_operation_data_store_cleaned_PRESENT;
+    append_log_item(&log_item);
 }
 
-
-void datastore_PI_Delete(const asn1SccKeyType *key )
+void datastore_PI_Create(const asn1SccDataStoreCreateRequect* request)
 {
-   DataStore_Delete(&datastore, *key);
+    if(request->behaviour == DataStoreCreateRequect_behaviour_reject_when_overflow)
+    {
+       if(is_storage_full())
+       {
+           // notify overflow
+           datastore_RI_ObetTime(&notify_message.u.item_store_rejected.timestamp);
+           notify_message.kind = T_EventMessage_item_store_rejected_PRESENT;
+           datastore_RI_notify(&notify_message);
+
+           // append log - store rejected
+           datastore_RI_ObetTime(&log_item.timestamp);
+           log_item.operation.kind = DataStoreInternalLogItem_operation_store_rejected_PRESENT;
+           append_log_item(&log_item);
+           return;
+       }
+    }
+    else
+    {
+        if (is_storage_full())
+        {
+            // find oldest item to remove
+            size_t index_to_remove = 0;
+            asn1SccULongInteger item_time = storage.arr[0].item_timestamp;
+
+            for(size_t index = 1; index < data_store_size; ++index)
+            {
+                if(item_time < storage.arr[index].item_timestamp)
+                {
+                    index_to_remove = index;
+                    item_time = storage.arr[index].item_timestamp;
+                }
+            }
+            // append log - item removed
+            datastore_RI_ObetTime(&log_item.timestamp);
+            log_item.operation.kind = DataStoreInternalLogItem_operation_item_removed_PRESENT;
+            log_item.operation.u.item_removed = storage.arr[index_to_remove].item_key;
+            append_log_item(&log_item);
+
+            // notify old removed
+            notify_message.kind = T_EventMessage_item_removed_PRESENT;
+            notify_message.u.item_removed.item_key = storage.arr[index_to_remove].item_key;
+            notify_message.u.item_removed.item_timestamp = storage.arr[index_to_remove].item_timestamp;
+            datastore_RI_notify(&notify_message);
+
+            // use old index to create
+            storage.arr[index_to_remove].item_key = storage_next_key;
+            ++storage_next_key;
+            storage.arr[index_to_remove].item_value = request->item_value;
+
+            datastore_RI_ObetTime(&storage.arr[storage_last_index].item_timestamp);
+
+            // notify create
+            notify_message.kind = T_EventMessage_item_created_PRESENT;
+            notify_message.u.item_created.item_key = storage.arr[index_to_remove].item_key;
+            notify_message.u.item_created.item_timestamp = storage.arr[index_to_remove].item_timestamp;
+            datastore_RI_notify(&notify_message);
+
+            // append log - item created
+            log_item.timestamp = storage.arr[index_to_remove].item_timestamp;
+            log_item.operation.kind = DataStoreInternalLogItem_operation_item_created_PRESENT;
+            log_item.operation.u.item_created = storage.arr[index_to_remove].item_key;
+            append_log_item(&log_item);
+            return;
+        }
+    }
+
+    // create
+    if(!is_storage_empty())
+    {
+        storage_last_index = (storage_last_index + 1) % data_store_size;
+    }
+    storage_empty = 0;
+    storage.arr[storage_last_index].item_key = storage_next_key;
+    ++storage_next_key;
+    storage.arr[storage_last_index].item_value = request->item_value;
+
+    datastore_RI_ObetTime(&storage.arr[storage_last_index].item_timestamp);
+
+    // notify create
+    notify_message.kind = T_EventMessage_item_created_PRESENT;
+    notify_message.u.item_created.item_key = storage.arr[storage_last_index].item_key = storage_next_key;
+    notify_message.u.item_created.item_timestamp = storage.arr[storage_last_index].item_timestamp;
+    datastore_RI_notify(&notify_message);
+
+    // append log - item created
+    log_item.timestamp = storage.arr[storage_last_index].item_timestamp;
+    log_item.operation.kind = DataStoreInternalLogItem_operation_item_created_PRESENT;
+    log_item.operation.u.item_created = storage.arr[storage_last_index].item_key;
+    append_log_item(&log_item);
 }
 
-
-void datastore_PI_Read(const asn1SccKeyType *key, asn1SccDataType *data)
+void datastore_PI_Delete(const asn1SccDataStoreDeleteRequest* request)
 {
-   data = DataStore_Read(&datastore, *key);
+    size_t index = find_key_in_storage(request->item_key);
+    if(index == data_store_size)
+    {
+        // notify error
+        notify_message.kind = T_EventMessage_data_store_error_PRESENT;
+        notify_message.u.data_store_error = T_EventMessage_data_store_error_item_not_found;
+        datastore_RI_notify(&notify_message);
+
+        // append log - data store error
+        datastore_RI_ObetTime(&log_item.timestamp);
+        log_item.operation.kind = DataStoreInternalLogItem_operation_data_store_error_PRESENT;
+        append_log_item(&log_item);
+    }
+    else
+    {
+        // append log - item deleted
+        datastore_RI_ObetTime(&log_item.timestamp);
+        log_item.operation.kind = DataStoreInternalLogItem_operation_item_deleted_PRESENT;
+        log_item.operation.u.item_deleted = request->item_key;
+        append_log_item(&log_item);
+
+        // notify item removed
+        notify_message.kind = T_EventMessage_item_deleted_PRESENT;
+        notify_message.u.item_deleted.item_key = storage.arr[index].item_key;
+        notify_message.u.item_deleted.item_timestamp = storage.arr[index].item_timestamp;
+        datastore_RI_notify(&notify_message);
+
+        // remove by moving existing items
+        for(; (index + 1) % data_store_size < storage_last_index; ++index)
+        {
+            storage.arr[index] = storage.arr[(index+1) % data_store_size];
+        }
+
+        if(storage_last_index == storage_first_index)
+        {
+            storage_empty = 1;
+        }
+        else
+        {
+            --storage_last_index;
+        }
+    }
 }
 
-
-void datastore_PI_Update(const asn1SccKeyType *key, const asn1SccDataType *data)
+void datastore_PI_Retrieve(const asn1SccDataStoreRetrieveRequest* request)
 {
-   DataStore_Update(&datastore, *key, *data);
+    size_t index = find_key_in_storage(request->item_key);
+    if(index == data_store_size)
+    {
+        // notify error
+        notify_message.kind = T_EventMessage_data_store_error_PRESENT;
+        notify_message.u.data_store_error = T_EventMessage_data_store_error_item_not_found;
+        datastore_RI_notify(&notify_message);
+
+        // append log - data store error
+        datastore_RI_ObetTime(&log_item.timestamp);
+        log_item.operation.kind = DataStoreInternalLogItem_operation_data_store_error_PRESENT;
+        append_log_item(&log_item);
+    }
+    else
+    {
+        // notify item retrieved
+        notify_message.kind = T_EventMessage_item_retrieved_PRESENT;
+        notify_message.u.item_retrieved.item_key = storage.arr[index].item_key;
+        notify_message.u.item_retrieved.item_value = storage.arr[index].item_value;
+        notify_message.u.item_retrieved.item_timestamp = storage.arr[index].item_timestamp;
+        datastore_RI_notify(&notify_message);
+
+        // append log - item retrieved
+        datastore_RI_ObetTime(&log_item.timestamp);
+        log_item.operation.kind = DataStoreInternalLogItem_operation_item_retrieved_PRESENT;
+        log_item.operation.u.item_retrieved = request->item_key;
+        append_log_item(&log_item);
+    }
 }
+
+void datastore_PI_RetriveByTimeRange(const asn1SccDataStoreRetrieveTimestampRangeRequest * request)
+{
+    // append log - retrieve by timestamp
+    datastore_RI_ObetTime(&log_item.timestamp);
+    log_item.operation.kind = DataStoreInternalLogItem_operation_item_by_timestamp_retrieved_PRESENT;
+    log_item.operation.u.item_by_timestamp_retrieved.starting_timestamp = request->starting_timestamp;
+    log_item.operation.u.item_by_timestamp_retrieved.ending_timestamp = request->ending_timestamp;
+    append_log_item(&log_item);
+
+    if(is_storage_empty())
+    {
+        // notify retrieve finished
+        notify_message.kind = T_EventMessage_item_by_timestamp_retrieved_PRESENT;
+        notify_message.u.item_by_timestamp_retrieved.kind = T_EventMessage_item_by_timestamp_retrieved_finished_PRESENT;
+        datastore_RI_notify(&notify_message);
+    }
+    else
+    {
+        // find items
+        for(size_t index = storage_first_index; index != storage_last_index + 1; ++index)
+        {
+            if(storage.arr[index].item_timestamp >= request->starting_timestamp
+                    && storage.arr[index].item_timestamp <= request->ending_timestamp)
+            {
+                // notify item retrieved
+                notify_message.kind = T_EventMessage_item_by_timestamp_retrieved_PRESENT;
+                notify_message.u.item_by_timestamp_retrieved.u.item.item_key = storage.arr[index].item_key;
+                notify_message.u.item_by_timestamp_retrieved.u.item.item_value = storage.arr[index].item_value;
+                notify_message.u.item_by_timestamp_retrieved.u.item.item_timestamp = storage.arr[index].item_timestamp;
+                datastore_RI_notify(&notify_message);
+            }
+        }
+
+        // notify retrieve finished
+        notify_message.kind = T_EventMessage_item_by_timestamp_retrieved_PRESENT;
+        notify_message.u.item_by_timestamp_retrieved.kind = T_EventMessage_item_by_timestamp_retrieved_finished_PRESENT;
+        datastore_RI_notify(&notify_message);
+    }
+}
+
+void datastore_PI_Update( const asn1SccDataStoreUpdateRequest * request)
+{
+    size_t index = find_key_in_storage(request->item_key);
+    if(index == data_store_size)
+    {
+        // notify error
+        notify_message.kind = T_EventMessage_data_store_error_PRESENT;
+        notify_message.u.data_store_error = T_EventMessage_data_store_error_item_not_found;
+        datastore_RI_notify(&notify_message);
+
+        // append log - data store error
+        datastore_RI_ObetTime(&log_item.timestamp);
+        log_item.operation.kind = DataStoreInternalLogItem_operation_data_store_error_PRESENT;
+        append_log_item(&log_item);
+    }
+    else
+    {
+        // perform item update
+        storage.arr[index].item_value = request->item_value;
+        datastore_RI_ObetTime(&storage.arr[index].item_timestamp);
+
+        // notify item updated
+        notify_message.kind = T_EventMessage_item_updated_PRESENT;
+        notify_message.u.item_updated.item_key = storage.arr[index].item_key;
+        notify_message.u.item_updated.item_timestamp = storage.arr[index].item_timestamp;
+        datastore_RI_notify(&notify_message);
+
+        // append log - item update
+        datastore_RI_ObetTime(&log_item.timestamp);
+        log_item.operation.kind = DataStoreInternalLogItem_operation_item_updated_PRESENT;
+        log_item.operation.u.item_updated = request->item_key;
+        append_log_item(&log_item);
+    }
+}
+
 
 
