@@ -367,6 +367,7 @@ void datastore_PI_subscribe_to_event(const asn1SccT_UInt32* event_id, const asn1
 {
     asn1SccPID sender = datastore_RI_get_sender();
 
+    printf("sender %d\n", sender);
     if(*event_id == event_id_datastore_notify)
     {
         datastore_notify_set_route_enabled(sender, *should_subscribe);

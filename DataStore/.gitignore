@@ -22,14 +22,23 @@ work/timeservice/C/src/*
 !work/timeservice/C/src/timeservice-rtems.h
 !work/timeservice/C/src/timeservice-utils.h
 
-# Except environment source
-!work/environment/
-work/environment/*
-!work/environment/C
-work/environment/C/*
-!work/environment/C/src
-work/environment/C/src/*
-!work/environment/C/src/environment.c
+# Except client1 source
+!work/client1/
+work/client1/*
+!work/client1/C
+work/client1/C/*
+!work/client1/C/src
+work/client1/C/src/*
+!work/client1/C/src/client1.c
+
+# Except client2 source
+!work/client2/
+work/client2/*
+!work/client2/C
+work/client2/C/*
+!work/client2/C/src
+work/client2/C/src/*
+!work/client2/C/src/client2.c
 
 # Except datastore source
 !work/datastore/
