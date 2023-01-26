@@ -24,7 +24,7 @@ static asn1SccT_EventMessage notify_message;
 
 static int is_storage_full(void)
 {
-    return !storage_empty && (storage_last_index == storage_first_index);
+    return !storage_empty && (((storage_last_index + 1) % data_store_size) == storage_first_index);
 }
 
 static int is_storage_empty(void)
