@@ -41,7 +41,7 @@ IMPORTS
 
    data-store-log-size UShortInteger ::= 50
 
-   DataStoreCreateRequect ::= SEQUENCE {
+   DataStoreCreateRequest ::= SEQUENCE {
       item-value DataStoreValueType,
       behaviour ENUMERATED { free-existing, reject-when-overflow }
    }

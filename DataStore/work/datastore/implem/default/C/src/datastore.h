@@ -20,7 +20,7 @@ void datastore_startup(void);
 void datastore_PI_Clean( void );
 
 
-void datastore_PI_Create( const asn1SccDataStoreCreateRequect * );
+void datastore_PI_Create( const asn1SccDataStoreCreateRequest * );
 
 
 void datastore_PI_Delete( const asn1SccDataStoreDeleteRequest * );

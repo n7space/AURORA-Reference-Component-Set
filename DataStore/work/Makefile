@@ -23,7 +23,7 @@ check_targets:
 	$(MAKE) -C build -f Makefile.taste check_targets
 
 # Generate the language-specific data view needed before editing user code
-dataview:	dataview/C/built
+dataview:	dataview/C/built dataview/Ada/built
 
 # Generate the complete dataview, including Python bindings if there is a GUI
 ${DATAVIEW_PATH}/built:  dataview
@@ -104,6 +104,11 @@ dataview/C/built: ${DATAVIEW_UNIQ} ${DATAVIEW_ACN} ${CP_FILES}
 	touch $@
 
 
+dataview/Ada/built: ${DATAVIEW_UNIQ} ${CP_FILES}
+	mkdir -p $(dir $@)
+	asn2dataModel -allboards -o $(dir $@) -toAda $^
+	touch $@
+	cd dataview/Ada && rm -f gnat.cfg GPS_project.gpr IgnoredExaminerWarnings.wrn runSpark.sh
 
 clean:
 	rm -rf binaries dataview

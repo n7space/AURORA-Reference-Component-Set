@@ -9,21 +9,66 @@
 */
 #include "environment.h"
 
+static asn1SccDataStoreCreateRequest create_request;
+
+static int counter;
+
 void environment_startup(void)
 {
-   // Write your initialisation code
-   // You may call sporadic required interfaces and start timers
-   // puts ("[Environment] Startup");
+    counter = 0;
 }
-
 
 void environment_PI_Trigger( void )
 {
+    if(counter < 200)
+    {
+        create_request.behaviour = DataStoreCreateRequest_behaviour_free_existing;
+        create_request.item_value.kind = DataStoreValueType_coefficient_PRESENT;
+        create_request.item_value.u.coefficient = 2;
+        environment_RI_Create(&create_request);
 
+        ++counter;
+    }
+    else
+    {
+        environment_RI_Clean();
+        counter = 0;
+    }
 }
-
 
 void environment_PI_notify( const asn1SccT_EventMessage * ev)
 {
-
+    switch(ev->kind)
+    {
+    case T_EventMessage_item_created_PRESENT:
+        printf("item created\n");
+        break;
+    case T_EventMessage_item_retrieved_PRESENT:
+        printf("item retrieved\n");
+        break;
+    case T_EventMessage_item_updated_PRESENT:
+        printf("item updated\n");
+        break;
+    case T_EventMessage_item_deleted_PRESENT:
+        printf("item deleted\n");
+        break;
+    case T_EventMessage_item_store_rejected_PRESENT:
+        printf("item store rejected\n");
+        break;
+    case T_EventMessage_item_by_timestamp_retrieved_PRESENT:
+        printf("item by timestamp retrieved\n");
+        break;
+    case T_EventMessage_item_removed_PRESENT:
+        printf("item removed\n");
+        break;
+    case T_EventMessage_data_store_cleaned_PRESENT:
+        printf("cleaned\n");
+        break;
+    case T_EventMessage_data_store_error_PRESENT:
+        printf("error\n");
+        break;
+    case T_EventMessage_NONE:
+        printf("none\n");
+        break;
+    }
 }

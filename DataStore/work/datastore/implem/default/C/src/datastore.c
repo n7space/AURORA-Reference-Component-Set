@@ -108,9 +108,9 @@ void datastore_PI_Clean(void)
     append_log_item(&log_item);
 }
 
-void datastore_PI_Create(const asn1SccDataStoreCreateRequect* request)
+void datastore_PI_Create(const asn1SccDataStoreCreateRequest* request)
 {
-    if(request->behaviour == DataStoreCreateRequect_behaviour_reject_when_overflow)
+    if(request->behaviour == DataStoreCreateRequest_behaviour_reject_when_overflow)
     {
        if(is_storage_full())
        {
@@ -298,7 +298,9 @@ void datastore_PI_RetriveByTimeRange(const asn1SccDataStoreRetrieveTimestampRang
     else
     {
         // find items
-        for(size_t index = storage_first_index; index != storage_last_index + 1; ++index)
+        for(size_t index = storage_first_index;
+            (index % data_store_size) != ((storage_last_index + 1) % data_store_size);
+            ++index)
         {
             if(storage.arr[index].item_timestamp >= request->starting_timestamp
                     && storage.arr[index].item_timestamp <= request->ending_timestamp)

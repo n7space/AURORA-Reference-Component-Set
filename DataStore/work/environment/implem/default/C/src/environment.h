@@ -26,7 +26,7 @@ void environment_PI_notify( const asn1SccT_EventMessage * );
 extern void environment_RI_Clean( void );
 
 
-extern void environment_RI_Create( const asn1SccDataStoreCreateRequect * );
+extern void environment_RI_Create( const asn1SccDataStoreCreateRequest * );
 
 
 extern void environment_RI_Delete( const asn1SccDataStoreDeleteRequest * );
