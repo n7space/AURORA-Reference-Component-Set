@@ -95,14 +95,11 @@ IMPORTS
    -- internal type used by data store service
    DataStoreInternalLogStorage ::= SEQUENCE (SIZE(data-store-log-size)) OF DataStoreInternalLogItem
 
+   event-id-datastore-notify T-UInt32 ::= 1
+
    T-EventMessage ::= CHOICE {
       item-created SEQUENCE {
          item-key DataStoreKeyType,
-         item-timestamp ULongInteger
-      },
-      item-retrieved SEQUENCE {
-         item-key DataStoreKeyType,
-         item-value DataStoreValueType,
          item-timestamp ULongInteger
       },
       item-updated SEQUENCE {
@@ -116,6 +113,21 @@ IMPORTS
       item-store-rejected SEQUENCE {
          timestamp ULongInteger
       },
+      item-removed SEQUENCE {
+         item-key DataStoreKeyType,
+         item-timestamp ULongInteger
+      },
+      data-store-cleaned SEQUENCE {
+      },
+      data-store-error ENUMERATED { item-not-found }
+   }
+
+   T-EventRetrieveMessage ::= CHOICE {
+      item-retrieved SEQUENCE {
+         item-key DataStoreKeyType,
+         item-value DataStoreValueType,
+         item-timestamp ULongInteger
+      },
       item-by-timestamp-retrieved CHOICE {
          finished SEQUENCE {},
          item SEQUENCE {
@@ -123,12 +135,6 @@ IMPORTS
             item-value DataStoreValueType,
             item-timestamp ULongInteger
          }
-      },
-      item-removed SEQUENCE {
-         item-key DataStoreKeyType,
-         item-timestamp ULongInteger
-      },
-      data-store-cleaned SEQUENCE {
       },
       data-store-error ENUMERATED { item-not-found }
    }

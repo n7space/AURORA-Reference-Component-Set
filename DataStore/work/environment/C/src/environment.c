@@ -8,18 +8,27 @@
     !! file. The up-to-date signatures can be found in the .ads file.   !!
 */
 #include "environment.h"
+#include "routing.h"
 
 static asn1SccDataStoreCreateRequest create_request;
 
 static int counter;
+static int subscribed;
 
 void environment_startup(void)
 {
     counter = 0;
+    subscribed = 0;
 }
 
 void environment_PI_Trigger( void )
 {
+    if(subscribed == 0)
+    {
+        asn1SccT_UInt32 event_id = event_id_datastore_notify;
+        asn1SccT_Boolean should_subscribe = 1;
+        environment_RI_subscribe_to_event(&event_id, &should_subscribe);
+    }
     if(counter < 200)
     {
         create_request.behaviour = DataStoreCreateRequest_behaviour_free_existing;
@@ -43,32 +52,56 @@ void environment_PI_notify( const asn1SccT_EventMessage * ev)
     case T_EventMessage_item_created_PRESENT:
         printf("item created\n");
         break;
-    case T_EventMessage_item_retrieved_PRESENT:
-        printf("item retrieved\n");
-        break;
+
     case T_EventMessage_item_updated_PRESENT:
         printf("item updated\n");
         break;
+
     case T_EventMessage_item_deleted_PRESENT:
         printf("item deleted\n");
         break;
+
     case T_EventMessage_item_store_rejected_PRESENT:
         printf("item store rejected\n");
         break;
-    case T_EventMessage_item_by_timestamp_retrieved_PRESENT:
-        printf("item by timestamp retrieved\n");
-        break;
+
     case T_EventMessage_item_removed_PRESENT:
         printf("item removed\n");
         break;
+
     case T_EventMessage_data_store_cleaned_PRESENT:
         printf("cleaned\n");
         break;
+
     case T_EventMessage_data_store_error_PRESENT:
         printf("error\n");
         break;
+
     case T_EventMessage_NONE:
         printf("none\n");
         break;
+
+    }
+}
+
+void environment_PI_notifyRetrieve(const asn1SccT_EventRetrieveMessage* ev)
+{
+    switch(ev->kind)
+    {
+        case T_EventRetrieveMessage_item_retrieved_PRESENT:
+            printf("item retrieved\n");
+            break;
+
+        case T_EventRetrieveMessage_item_by_timestamp_retrieved_PRESENT:
+            printf("item by timestamp retrieved\n");
+            break;
+
+        case T_EventRetrieveMessage_data_store_error_PRESENT:
+            printf("error\n");
+            break;
+
+        case T_EventRetrieveMessage_NONE:
+            printf("none\n");
+            break;
     }
 }

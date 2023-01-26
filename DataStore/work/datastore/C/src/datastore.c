@@ -8,6 +8,7 @@
     !! file. The up-to-date signatures can be found in the .ads file.   !!
 */
 #include "datastore.h"
+#include "routing.h"
 
 static asn1SccDataStoreInternalDataStorage storage;
 static size_t storage_first_index;
@@ -21,6 +22,7 @@ static int log_storage_empty;
 
 static asn1SccDataStoreInternalLogItem log_item;
 static asn1SccT_EventMessage notify_message;
+static asn1SccT_EventRetrieveMessage notify_retrieve_message;
 
 static int is_storage_full(void)
 {
@@ -90,6 +92,8 @@ void datastore_startup(void)
     log_storage_first_index = 0;
     log_storage_last_index = 0;
     log_storage_empty = 1;
+
+    datastore_notify_set_all_routes_enabled(0);
 }
 
 void datastore_PI_Clean(void)
@@ -249,13 +253,15 @@ void datastore_PI_Delete(const asn1SccDataStoreDeleteRequest* request)
 
 void datastore_PI_Retrieve(const asn1SccDataStoreRetrieveRequest* request)
 {
+    asn1SccPID sender = datastore_RI_get_sender();
+
     size_t index = find_key_in_storage(request->item_key);
     if(index == data_store_size)
     {
         // notify error
-        notify_message.kind = T_EventMessage_data_store_error_PRESENT;
-        notify_message.u.data_store_error = T_EventMessage_data_store_error_item_not_found;
-        datastore_RI_notify(&notify_message);
+        notify_retrieve_message.kind = T_EventRetrieveMessage_data_store_error_PRESENT;
+        notify_retrieve_message.u.data_store_error = T_EventRetrieveMessage_data_store_error_item_not_found;
+        datastore_RI_notifyRetrieve_To_PID(sender, &notify_retrieve_message);
 
         // append log - data store error
         datastore_RI_ObetTime(&log_item.timestamp);
@@ -265,11 +271,11 @@ void datastore_PI_Retrieve(const asn1SccDataStoreRetrieveRequest* request)
     else
     {
         // notify item retrieved
-        notify_message.kind = T_EventMessage_item_retrieved_PRESENT;
-        notify_message.u.item_retrieved.item_key = storage.arr[index].item_key;
-        notify_message.u.item_retrieved.item_value = storage.arr[index].item_value;
-        notify_message.u.item_retrieved.item_timestamp = storage.arr[index].item_timestamp;
-        datastore_RI_notify(&notify_message);
+        notify_retrieve_message.kind = T_EventRetrieveMessage_item_retrieved_PRESENT;
+        notify_retrieve_message.u.item_retrieved.item_key = storage.arr[index].item_key;
+        notify_retrieve_message.u.item_retrieved.item_value = storage.arr[index].item_value;
+        notify_retrieve_message.u.item_retrieved.item_timestamp = storage.arr[index].item_timestamp;
+        datastore_RI_notifyRetrieve_To_PID(sender, &notify_retrieve_message);
 
         // append log - item retrieved
         datastore_RI_ObetTime(&log_item.timestamp);
@@ -281,6 +287,7 @@ void datastore_PI_Retrieve(const asn1SccDataStoreRetrieveRequest* request)
 
 void datastore_PI_RetriveByTimeRange(const asn1SccDataStoreRetrieveTimestampRangeRequest * request)
 {
+    asn1SccPID sender = datastore_RI_get_sender();
     // append log - retrieve by timestamp
     datastore_RI_ObetTime(&log_item.timestamp);
     log_item.operation.kind = DataStoreInternalLogItem_operation_item_by_timestamp_retrieved_PRESENT;
@@ -291,9 +298,9 @@ void datastore_PI_RetriveByTimeRange(const asn1SccDataStoreRetrieveTimestampRang
     if(is_storage_empty())
     {
         // notify retrieve finished
-        notify_message.kind = T_EventMessage_item_by_timestamp_retrieved_PRESENT;
-        notify_message.u.item_by_timestamp_retrieved.kind = T_EventMessage_item_by_timestamp_retrieved_finished_PRESENT;
-        datastore_RI_notify(&notify_message);
+        notify_retrieve_message.kind = T_EventRetrieveMessage_item_by_timestamp_retrieved_PRESENT;
+        notify_retrieve_message.u.item_by_timestamp_retrieved.kind = T_EventRetrieveMessage_item_by_timestamp_retrieved_finished_PRESENT;
+        datastore_RI_notifyRetrieve_To_PID(sender, &notify_retrieve_message);
     }
     else
     {
@@ -306,18 +313,18 @@ void datastore_PI_RetriveByTimeRange(const asn1SccDataStoreRetrieveTimestampRang
                     && storage.arr[index].item_timestamp <= request->ending_timestamp)
             {
                 // notify item retrieved
-                notify_message.kind = T_EventMessage_item_by_timestamp_retrieved_PRESENT;
-                notify_message.u.item_by_timestamp_retrieved.u.item.item_key = storage.arr[index].item_key;
-                notify_message.u.item_by_timestamp_retrieved.u.item.item_value = storage.arr[index].item_value;
-                notify_message.u.item_by_timestamp_retrieved.u.item.item_timestamp = storage.arr[index].item_timestamp;
-                datastore_RI_notify(&notify_message);
+                notify_retrieve_message.kind = T_EventRetrieveMessage_item_by_timestamp_retrieved_PRESENT;
+                notify_retrieve_message.u.item_by_timestamp_retrieved.u.item.item_key = storage.arr[index].item_key;
+                notify_retrieve_message.u.item_by_timestamp_retrieved.u.item.item_value = storage.arr[index].item_value;
+                notify_retrieve_message.u.item_by_timestamp_retrieved.u.item.item_timestamp = storage.arr[index].item_timestamp;
+                datastore_RI_notifyRetrieve_To_PID(sender, &notify_retrieve_message);
             }
         }
 
         // notify retrieve finished
-        notify_message.kind = T_EventMessage_item_by_timestamp_retrieved_PRESENT;
-        notify_message.u.item_by_timestamp_retrieved.kind = T_EventMessage_item_by_timestamp_retrieved_finished_PRESENT;
-        datastore_RI_notify(&notify_message);
+        notify_retrieve_message.kind = T_EventRetrieveMessage_item_by_timestamp_retrieved_PRESENT;
+        notify_retrieve_message.u.item_by_timestamp_retrieved.kind = T_EventRetrieveMessage_item_by_timestamp_retrieved_finished_PRESENT;
+        datastore_RI_notifyRetrieve_To_PID(sender, &notify_retrieve_message);
     }
 }
 
@@ -353,6 +360,16 @@ void datastore_PI_Update( const asn1SccDataStoreUpdateRequest * request)
         log_item.operation.kind = DataStoreInternalLogItem_operation_item_updated_PRESENT;
         log_item.operation.u.item_updated = request->item_key;
         append_log_item(&log_item);
+    }
+}
+
+void datastore_PI_subscribe_to_event(const asn1SccT_UInt32* event_id, const asn1SccT_Boolean* should_subscribe)
+{
+    asn1SccPID sender = datastore_RI_get_sender();
+
+    if(*event_id == event_id_datastore_notify)
+    {
+        datastore_notify_set_route_enabled(sender, *should_subscribe);
     }
 }
 
