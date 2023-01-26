@@ -1,11 +1,41 @@
-**/work/binaries/
-**/work/build/
-**/work/Debug/
-**/work/Dump/
-**/work/glue_release
-**/work/skeletons_built
-**/work/system.asn
-**/work.system_post.asn
-.vscode/
+default_attributes.xml
+
+*.aadl
+.cache/
 *.pro.user
-*.msc
+
+# Ignore whole work directory
+work/*
+
+# Except timeservice source
+!work/timeservice/
+work/timeservice/*
+!work/timeservice/C
+work/timeservice/C/*
+!work/timeservice/C/src
+work/timeservice/C/src/*
+!work/timeservice/C/src/timeservice.c
+!work/timeservice/C/src/timeservice-api.c
+!work/timeservice/C/src/timeservice-api.h
+!work/timeservice/C/src/timeservice-dummy.h
+!work/timeservice/C/src/timeservice-linux.h
+!work/timeservice/C/src/timeservice-rtems.h
+!work/timeservice/C/src/timeservice-utils.h
+
+# Except environment source
+!work/environment/
+work/environment/*
+!work/environment/C
+work/environment/C/*
+!work/environment/C/src
+work/environment/C/src/*
+!work/environment/C/src/environment.c
+
+# Except datastore source
+!work/datastore/
+work/datastore/*
+!work/datastore/C
+work/datastore/C/*
+!work/datastore/C/src
+work/datastore/C/src/*
+!work/datastore/C/src/datastore.c

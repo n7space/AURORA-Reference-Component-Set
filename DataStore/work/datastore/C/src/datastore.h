@@ -35,6 +35,9 @@ void datastore_PI_RetriveByTimeRange( const asn1SccDataStoreRetrieveTimestampRan
 void datastore_PI_Update( const asn1SccDataStoreUpdateRequest * );
 
 /* Required interfaces */
+extern void datastore_RI_CfsTimestamp( const asn1SccULongInteger *, asn1SccCfsTimestamp * );
+
+
 extern void datastore_RI_CfsTimestampCmp( const asn1SccCfsTimestamp *, const asn1SccCfsTimestamp *, asn1SccComparisonResult * );
 
 
