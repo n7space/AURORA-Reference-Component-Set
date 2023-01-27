@@ -376,7 +376,7 @@ void datastore_PI_RetrieveLogItem( asn1SccT_EventRetrieveLogMessage* item, const
     else
     {
         size_t current = log_storage_last_index;
-        while(current != log_storage_first_index && current != (size_t)index)
+        while(current != log_storage_first_index && current != (size_t)(*index))
         {
             if(current == 0)
             {
@@ -387,7 +387,7 @@ void datastore_PI_RetrieveLogItem( asn1SccT_EventRetrieveLogMessage* item, const
                 --current;
             }
         }
-        if(current != (size_t)index)
+        if(current != (size_t)(*index))
         {
             item->kind = T_EventRetrieveLogMessage_no_item_PRESENT;
         }

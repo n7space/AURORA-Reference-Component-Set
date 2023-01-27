@@ -85,7 +85,7 @@ void client1_PI_notify( const asn1SccT_EventMessage * ev)
 
     }
 
-    asn1SccUShortInteger index;
+    asn1SccUShortInteger index = 0;
     client1_RI_RetrieveLogItem(&log_message, &index);
 }
 
