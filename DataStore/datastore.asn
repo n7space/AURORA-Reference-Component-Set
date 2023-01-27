@@ -139,5 +139,10 @@ IMPORTS
       data-store-error ENUMERATED { item-not-found }
    }
 
+   T-EventRetrieveLogMessage ::= CHOICE {
+      log-item DataStoreInternalLogItem,
+      no-item SEQUENCE {}
+   }
+
 END
 

@@ -11,6 +11,7 @@
 #include "routing.h"
 
 static asn1SccDataStoreCreateRequest create_request;
+static asn1SccT_EventRetrieveLogMessage log_message;
 
 static int counter;
 static int subscribed;
@@ -83,6 +84,9 @@ void client1_PI_notify( const asn1SccT_EventMessage * ev)
         break;
 
     }
+
+    asn1SccUShortInteger index = 0;
+    client1_RI_RetrieveLogItem(&log_message, &index);
 }
 
 void client1_PI_notifyRetrieve(const asn1SccT_EventRetrieveMessage* ev)

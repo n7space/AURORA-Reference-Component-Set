@@ -10,6 +10,8 @@
 #include "datastore.h"
 #include "routing.h"
 
+extern void datastore_RI_get_sender(asn1SccPID *);
+
 static asn1SccDataStoreInternalDataStorage storage;
 static size_t storage_first_index;
 static size_t storage_last_index;
@@ -362,6 +364,38 @@ void datastore_PI_Update( const asn1SccDataStoreUpdateRequest * request)
         log_item.operation.kind = DataStoreInternalLogItem_operation_item_updated_PRESENT;
         log_item.operation.u.item_updated = request->item_key;
         append_log_item(&log_item);
+    }
+}
+
+void datastore_PI_RetrieveLogItem( asn1SccT_EventRetrieveLogMessage* item, const asn1SccUShortInteger* index)
+{
+    if(log_storage_empty)
+    {
+        item->kind = T_EventRetrieveLogMessage_no_item_PRESENT;
+    }
+    else
+    {
+        size_t current = log_storage_last_index;
+        while(current != log_storage_first_index && current != (size_t)(*index))
+        {
+            if(current == 0)
+            {
+                current = data_store_size - 1;
+            }
+            else
+            {
+                --current;
+            }
+        }
+        if(current != (size_t)(*index))
+        {
+            item->kind = T_EventRetrieveLogMessage_no_item_PRESENT;
+        }
+        else
+        {
+            item->kind = T_EventRetrieveLogMessage_log_item_PRESENT;
+            item->u.log_item = log_storage.arr[current];
+        }
     }
 }
 
