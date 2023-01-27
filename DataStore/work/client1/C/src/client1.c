@@ -28,6 +28,7 @@ void client1_PI_Trigger( void )
         asn1SccT_UInt32 event_id = event_id_datastore_notify;
         asn1SccT_Boolean should_subscribe = 1;
         client1_RI_subscribe_to_event(&event_id, &should_subscribe);
+        subscribed = 1;
     }
     if(counter < 200)
     {
@@ -50,35 +51,35 @@ void client1_PI_notify( const asn1SccT_EventMessage * ev)
     switch(ev->kind)
     {
     case T_EventMessage_item_created_PRESENT:
-        printf("item created\n");
+        printf("client1: item created %lu\n", ev->u.item_created.item_key);
         break;
 
     case T_EventMessage_item_updated_PRESENT:
-        printf("item updated\n");
+        printf("client1: item updated %lu\n", ev->u.item_updated.item_key);
         break;
 
     case T_EventMessage_item_deleted_PRESENT:
-        printf("item deleted\n");
+        printf("client1: item deleted %lu\n", ev->u.item_deleted.item_key);
         break;
 
     case T_EventMessage_item_store_rejected_PRESENT:
-        printf("item store rejected\n");
+        printf("client1: item store rejected\n");
         break;
 
     case T_EventMessage_item_removed_PRESENT:
-        printf("item removed\n");
+        printf("client1: item removed %lu\n", ev->u.item_removed.item_key);
         break;
 
     case T_EventMessage_data_store_cleaned_PRESENT:
-        printf("cleaned\n");
+        printf("client1: cleaned\n");
         break;
 
     case T_EventMessage_data_store_error_PRESENT:
-        printf("error\n");
+        printf("client1: error\n");
         break;
 
     case T_EventMessage_NONE:
-        printf("none\n");
+        printf("client1: none\n");
         break;
 
     }
@@ -89,19 +90,19 @@ void client1_PI_notifyRetrieve(const asn1SccT_EventRetrieveMessage* ev)
     switch(ev->kind)
     {
         case T_EventRetrieveMessage_item_retrieved_PRESENT:
-            printf("item retrieved\n");
+            printf("client1: item retrieved %lu\n", ev->u.item_retrieved.item_key);
             break;
 
         case T_EventRetrieveMessage_item_by_timestamp_retrieved_PRESENT:
-            printf("item by timestamp retrieved\n");
+            printf("client1: item by timestamp retrieved\n");
             break;
 
         case T_EventRetrieveMessage_data_store_error_PRESENT:
-            printf("error\n");
+            printf("client1: error\n");
             break;
 
         case T_EventRetrieveMessage_NONE:
-            printf("none\n");
+            printf("client1: none\n");
             break;
     }
 }

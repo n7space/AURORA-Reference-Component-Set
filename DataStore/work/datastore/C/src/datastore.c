@@ -253,7 +253,8 @@ void datastore_PI_Delete(const asn1SccDataStoreDeleteRequest* request)
 
 void datastore_PI_Retrieve(const asn1SccDataStoreRetrieveRequest* request)
 {
-    asn1SccPID sender = datastore_RI_get_sender();
+    asn1SccPID sender;
+    datastore_RI_get_sender(&sender);
 
     size_t index = find_key_in_storage(request->item_key);
     if(index == data_store_size)
@@ -287,7 +288,8 @@ void datastore_PI_Retrieve(const asn1SccDataStoreRetrieveRequest* request)
 
 void datastore_PI_RetriveByTimeRange(const asn1SccDataStoreRetrieveTimestampRangeRequest * request)
 {
-    asn1SccPID sender = datastore_RI_get_sender();
+    asn1SccPID sender;
+    datastore_RI_get_sender(&sender);
     // append log - retrieve by timestamp
     datastore_RI_ObetTime(&log_item.timestamp);
     log_item.operation.kind = DataStoreInternalLogItem_operation_item_by_timestamp_retrieved_PRESENT;
@@ -365,9 +367,9 @@ void datastore_PI_Update( const asn1SccDataStoreUpdateRequest * request)
 
 void datastore_PI_subscribe_to_event(const asn1SccT_UInt32* event_id, const asn1SccT_Boolean* should_subscribe)
 {
-    asn1SccPID sender = datastore_RI_get_sender();
+    asn1SccPID sender;
+    datastore_RI_get_sender(&sender);
 
-    printf("sender %d\n", sender);
     if(*event_id == event_id_datastore_notify)
     {
         datastore_notify_set_route_enabled(sender, *should_subscribe);
