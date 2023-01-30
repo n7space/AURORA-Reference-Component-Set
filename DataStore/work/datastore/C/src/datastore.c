@@ -165,7 +165,7 @@ void datastore_PI_Create(const asn1SccDataStoreCreateRequest* request)
             ++storage_next_key;
             storage.arr[index_to_remove].item_value = request->item_value;
 
-            datastore_RI_ObetTime(&storage.arr[storage_last_index].item_timestamp);
+            datastore_RI_ObetTime(&storage.arr[index_to_remove].item_timestamp);
 
             // notify create
             notify_message.kind = T_EventMessage_item_created_PRESENT;
@@ -196,7 +196,8 @@ void datastore_PI_Create(const asn1SccDataStoreCreateRequest* request)
 
     // notify create
     notify_message.kind = T_EventMessage_item_created_PRESENT;
-    notify_message.u.item_created.item_key = storage.arr[storage_last_index].item_key = storage_next_key;
+    notify_message.u.item_created.item_key = storage.arr[storage_last_index].item_key
+            = storage.arr[storage_last_index].item_key;
     notify_message.u.item_created.item_timestamp = storage.arr[storage_last_index].item_timestamp;
     datastore_RI_notify(&notify_message);
 
