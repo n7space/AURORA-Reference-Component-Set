@@ -142,7 +142,7 @@ void datastore_PI_Create(const asn1SccDataStoreCreateRequest* request)
 
             for(size_t index = 1; index < data_store_size; ++index)
             {
-                if(item_time < storage.arr[index].item_timestamp)
+                if(item_time > storage.arr[index].item_timestamp)
                 {
                     index_to_remove = index;
                     item_time = storage.arr[index].item_timestamp;
