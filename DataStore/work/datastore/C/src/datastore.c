@@ -288,7 +288,7 @@ void datastore_PI_Retrieve(const asn1SccDataStoreRetrieveRequest* request)
     }
 }
 
-void datastore_PI_RetriveByTimeRange(const asn1SccDataStoreRetrieveTimestampRangeRequest * request)
+void datastore_PI_RetrieveByTimeRange(const asn1SccDataStoreRetrieveTimestampRangeRequest * request)
 {
     asn1SccPID sender;
     datastore_RI_get_sender(&sender);
