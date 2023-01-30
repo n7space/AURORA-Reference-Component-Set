@@ -318,6 +318,7 @@ void datastore_PI_RetrieveByTimeRange(const asn1SccDataStoreRetrieveTimestampRan
             {
                 // notify item retrieved
                 notify_retrieve_message.kind = T_EventRetrieveMessage_item_by_timestamp_retrieved_PRESENT;
+                notify_retrieve_message.u.item_by_timestamp_retrieved.kind = T_EventRetrieveMessage_item_by_timestamp_retrieved_item_PRESENT;
                 notify_retrieve_message.u.item_by_timestamp_retrieved.u.item.item_key = storage.arr[index].item_key;
                 notify_retrieve_message.u.item_by_timestamp_retrieved.u.item.item_value = storage.arr[index].item_value;
                 notify_retrieve_message.u.item_by_timestamp_retrieved.u.item.item_timestamp = storage.arr[index].item_timestamp;
